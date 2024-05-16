@@ -1,16 +1,18 @@
-import Login from "./Components/Login";
 import "./App.css";
-import { Signup } from "./Components/Signup";
-import { Home } from "./Components/Home";
-import Admin from "./Components/Admin";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { UserRouts } from "./routers/UserRouts";
+
 function App() {
   return (
-    <>
-    <Admin/>
-      {/* <Home /> */}
-      {/* <Login/> */}
-      {/* <Signup /> */}
-    </>
+    <Router>
+      <Routes>
+        <Route path="/*" element={<UserRouts/>} />
+        <Route path="/admin/*" element={<UserRouts/>} />
+
+
+        
+      </Routes>
+    </Router>
   );
 }
 

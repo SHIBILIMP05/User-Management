@@ -1,5 +1,5 @@
 
-const starting = async(req,res)=>{
+export const starting = async(req,res)=>{
    try {
     console.log("starting function running");
     res.json({start:"application started"})
@@ -8,6 +8,3 @@ const starting = async(req,res)=>{
    }
 }
 
-export{
-    starting,
-}

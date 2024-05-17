@@ -1,5 +1,5 @@
 import User from "../model/userModel.js";
-import { sign } from "jsonwebtoken";
+import jwt from 'jsonwebtoken'
 export const starting = async (req, res) => {
    try {
       console.log("starting function running");
@@ -28,7 +28,8 @@ export const signupDetail = async (req, res) => {
          })
          const userData = await data.save()
          console.log(userData)
-
+         const token = jwt.sign(userData,process.env.JwtKey,{expiresIn:"30d"})
+         res.json({token:token,userData})
       }
 
    } catch (error) {

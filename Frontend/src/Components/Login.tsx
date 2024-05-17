@@ -1,8 +1,12 @@
+import axios from "axios";
+
 const Login = () => {
+  
+ 
   return (
     <div className="w-screen bg-C2 h-screen flex justify-center items-center">
-      <div className=" bg-C3 w-[400px] h-[550px]  flex justify-center items-center">
-        <div className="w-[400px] h-[550px] py-6 flex flex-col  items-center justify-between bg-C2 rounded-tl-full rounded-br-full ">
+      <div className=" bg-C3 w-[425px] h-[550px]  flex justify-center items-center">
+        <div className="w-[425px] h-[550px] py-6 flex flex-col  items-center justify-between bg-C2 rounded-tl-full rounded-br-full ">
           <div className=" font-bold-sm font-font11 text-C1 text-5xl w-auto h-auto">
             Login
           </div>

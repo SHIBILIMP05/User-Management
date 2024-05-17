@@ -1,8 +1,10 @@
 import express from 'express'
 import cors from 'cors'
+import dotenv from 'dotenv'
 import { connectDB } from './config/mongoAuth.js'
 import {userRouter} from './routers/userRouter.js'
 
+dotenv.config()
 connectDB()
 const app = express()
 

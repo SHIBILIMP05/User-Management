@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
 export const connectDB = () => {
-    mongoose.connect('mongodb://localhost:27017/user-management')
+    mongoose.connect(process.env.MongoUrl)
     console.log("db connected...");
 }

@@ -51,15 +51,15 @@ export const login = async (req, res) => {
       const userData = await User.findOne({ email: email })
 
       if (!userData) {
-         res.json({ exist: false })
+         res.json({ verify: true })
       } else {
-         console.log("password::::", userData.password);
          const passCheck = await bcrypt.compare(password, userData.password)
          if (!passCheck) {
             res.json({ invalid: true })
          } else {
-            const token = jwt.sign(userData, process.env.JwtKey, { expiresIn: "30d" })
-            res.json({ token: token, userData: userData })
+            const userObject = userData.toObject()
+            const token = jwt.sign(userObject, process.env.JwtKey, { expiresIn: "30d" })
+            res.json({ token: token, userData: userObject })
          }
       }
    } catch (error) {

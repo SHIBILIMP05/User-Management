@@ -31,7 +31,15 @@ interface LogDetails{
 }
 
 export const login = async(logDetails:LogDetails)=>{
-    const response = await instance.post('/login',logDetails)
-    console.log(response.data);
+    try {
+        const response = await instance.post('/login',logDetails)
+        console.log(response.data);
+    } catch (error) {
+        console.log(error);
+        
+    }
+   
     
 }
+
+

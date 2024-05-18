@@ -1,5 +1,6 @@
 import User from "../model/userModel.js";
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 export const starting = async (req, res) => {
    try {
       console.log("starting function running");
@@ -19,11 +20,13 @@ export const signupDetail = async (req, res) => {
       if (exist) {
          res.json({ exist: true })
       } else {
-
+         const saltRound = 10;
+         const salt = await bcrypt.genSalt(saltRound)
+         const hashedPassword = await bcrypt.hash(password, salt)
          const data = new User({
             name: name,
             email: email,
-            password: password,
+            password: hashedPassword,
             is_verified: true,
             is_admin: false
          })
@@ -41,10 +44,24 @@ export const signupDetail = async (req, res) => {
    }
 }
 
-export const login = async(req,res)=>{
+export const login = async (req, res) => {
    try {
-      const {email,password}=req.body
-      console.log(email);
+      const { email, password } = req.body
+
+      const userData = await User.findOne({ email: email })
+
+      if (!userData) {
+         res.json({ exist: false })
+      } else {
+         console.log("password::::", userData.password);
+         const passCheck = await bcrypt.compare(password, userData.password)
+         if (!passCheck) {
+            res.json({ invalid: true })
+         } else {
+            const token = jwt.sign(userData, process.env.JwtKey, { expiresIn: "30d" })
+            res.json({ token: token, userData: userData })
+         }
+      }
    } catch (error) {
       console.log(error);
    }

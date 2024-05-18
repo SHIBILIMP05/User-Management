@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { signup } from "../APIs/userApi";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { userDetails } from "../redux/slice/userSlice";
 
 export const Signup = () => {
   const [name, setName] = useState("");
@@ -9,6 +12,9 @@ export const Signup = () => {
   const [confirmPassword, setConfirm] = useState("");
   const emailPattern: RegExp =
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const submitHandle = async () => {
     try {
@@ -25,22 +31,36 @@ export const Signup = () => {
       } else if (confirmPassword !== password) {
         return toast.error("Please confirm your password correctly !");
       }
-      const status = await signup({
+
+      let status = await signup({
         name,
         email,
         password,
-        confirmPassword,
       });
-      console.log("status", status);
+
+      if (status.exist) {
+        toast.warning("Your account already exist please login");
+      } else {
+        localStorage.setItem("token", status.token);
+        dispatch(
+          userDetails({
+            name: status.userData.name,
+            email: status.userData.email,
+            is_admin: status.userData.is_admin,
+            id: status.userData.id,
+          })
+        );
+        navigate("/");
+      }
     } catch (error) {
       console.log(error);
     }
   };
 
-  return (
+  return(
     <div className="w-screen bg-C2 h-screen flex justify-center items-center">
-      <div className=" bg-C3 w-[500px] h-[675px]  flex justify-center items-center">
-        <div className="w-[500px] h-[675px] py-6 flex flex-col  items-center justify-between bg-C2 rounded-tl-full rounded-br-full ">
+      <div className=" bg-C3 w-[500px] h-[700px]  flex justify-center items-center">
+        <div className="w-[500px] h-[700px] py-6 flex flex-col  items-center justify-between bg-C2 rounded-tl-full rounded-br-full ">
           <div className=" font-bold-sm font-font11 text-C1 text-5xl w-auto h-auto">
             Signup
           </div>
@@ -77,8 +97,17 @@ export const Signup = () => {
               type="password"
               name="cnfPassword"
             />
+            <div className=" text-white w-auto h-auto flex flex-col items-center">
+              <p className="text-[16px]">Already have an account ? </p>
+              <span
+                onClick={() => navigate("/login")}
+                className="underline text-[16px]"
+              >
+                login
+              </span>
+            </div>
           </div>
-          <div className=" w-auto h-auto">
+          <div className="w-auto h-auto">
             <input
               onClick={submitHandle}
               className=" bg-C1 text-C3 w-60 h-10 rounded-bl-xl rounded-tr-xl text-center"

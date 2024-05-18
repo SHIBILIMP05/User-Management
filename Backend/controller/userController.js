@@ -13,7 +13,7 @@ export const starting = async (req, res) => {
 
 export const signupDetail = async (req, res) => {
    try {
-      const { name, email, password, confirmPassword } = req.body
+      const { name, email, password } = req.body
       const exist = await User.findOne({ email: email })
 
       if (exist) {
@@ -24,14 +24,27 @@ export const signupDetail = async (req, res) => {
             name: name,
             email: email,
             password: password,
-            is_verified: true
+            is_verified: true,
+            is_admin: false
          })
          const userData = await data.save()
-         console.log(userData)
-         const token = jwt.sign(userData,process.env.JwtKey,{expiresIn:"30d"})
-         res.json({token:token,userData})
+
+         const userObject = userData.toObject()
+
+         const token = jwt.sign(userObject, process.env.JwtKey, { expiresIn: "30d" })
+
+         res.json({ token: token, userData: userObject })
       }
 
+   } catch (error) {
+      console.log(error);
+   }
+}
+
+export const login = async(req,res)=>{
+   try {
+      const {email,password}=req.body
+      console.log(email);
    } catch (error) {
       console.log(error);
    }

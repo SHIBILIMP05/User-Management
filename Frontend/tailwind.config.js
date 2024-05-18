@@ -6,21 +6,19 @@ export default {
   ],
   theme: {
     extend: {
-      fontFamily:{
-        "font11":["Spectral", "serif"]
+      fontFamily: {
+        "font11": ["Spectral", "serif"]
       },
-      backgroundColor:{
-        "B1":"#9cd3d3",        
+      backgroundColor: {
+        "B1": "#9cd3d3",
       },
-      colors:{
-        "C1":"#785e4d",
-        "C2":"#baaf92",
-        "C3":"#f2eee3",
-
+      colors: {
+        "C1": "#EDF4F2",
+        "C2": "#2A3132",
+        "C3": "#31473A",
       }
     },
   },
   plugins: [],
 }
 
-  

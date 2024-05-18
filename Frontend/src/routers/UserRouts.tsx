@@ -1,13 +1,17 @@
 import { Routes, Route } from "react-router-dom";
-import Login from "../Components/Login";
-import { Signup } from "../Components/Signup";
+import Login from "../Components/Login.tsx";
+import { Signup } from "../Components/Signup.tsx";
+import { Home } from "../Components/Home.tsx";
+import LogAuth from "../authentications/userLoginAuth.tsx";
+import LogOutAuth from "../authentications/logOutAuth.tsx";
 
 export const UserRouts = () => {
   return (
     
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+      <Routes> 
+        <Route path="/" element={<LogAuth > <Home /> </LogAuth>} />
+        <Route path="/login" element={<LogOutAuth> <Login /> </LogOutAuth>} />
+        <Route path="/signup" element={<LogOutAuth> <Signup /> </LogOutAuth>}/>
       </Routes>
    
   );

@@ -8,7 +8,6 @@ interface userDetails {
     name:string;
     email:string;
     password:string;
-    confirmPassword:string;
 }
 
 export const signup = async(userDetails:userDetails)=>{
@@ -16,7 +15,9 @@ export const signup = async(userDetails:userDetails)=>{
         console.log("hello welcome");
         
         const response = await instance.post('/signup',userDetails)
+      
         return response.data
+        
     } catch (error) {
         console.log(error);
         
@@ -24,3 +25,13 @@ export const signup = async(userDetails:userDetails)=>{
     }
 }
 
+interface LogDetails{
+    email:string
+    password:string
+}
+
+export const login = async(logDetails:LogDetails)=>{
+    const response = await instance.post('/login',logDetails)
+    console.log(response.data);
+    
+}

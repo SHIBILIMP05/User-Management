@@ -1,11 +1,13 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { UserRouts } from "./routers/UserRouts";
+import { UserRouts } from "./routers/UserRouts.tsx";
 import { Toaster } from "sonner";
-
-function App() {
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
+import React from "react";
+const App:React.FC=()=> {
   return (
-    <>
+    <Provider  store={store}>
     <Toaster position="top-center" richColors/>
     <Router>
       <Routes>
@@ -13,7 +15,7 @@ function App() {
         <Route path="/admin/*" element={<UserRouts />} />
       </Routes>
     </Router>
-    </>
+    </Provider>
   );
 }
 

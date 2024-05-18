@@ -1,19 +1,47 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../APIs/userApi";
+import { toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { userDetails } from "../redux/slice/userSlice";
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   const [email,setEmail] = useState('')
   const [password,setPassword]=useState('')
+  const emailPattern: RegExp =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+
   
   const handleLogin = async()=>{
+
+    if(!email||email.startsWith(" ")||!emailPattern.test(email)){
+      return toast.error("Please enter a valid email !")
+    }else if(!password){
+      return toast.error("Please enter the password !")
+    }
    const status = await login({
     email:email,
     password:password
    })
-console.log(status);
+
+       if(status.verify){
+        return toast.error("You don't hav an account, please register your account !")
+       }else if(status.invalid){
+        return toast.error("Please enter a valid password !")
+       }else{
+        localStorage.setItem("token",status.token)
+        dispatch(userDetails({
+          name: status.userData.name,
+          email: status.userData.email,
+          is_admin: status.userData.is_admin,
+          id: status.userData.id,
+        }))
+        navigate('/')
+       }
+
 
 
   }
@@ -56,6 +84,7 @@ console.log(status);
           <div className=" w-auto h-auto">
             <input
             onClick={handleLogin}
+            type="submit"
               className=" bg-C1 text-C3 w-60 h-10 rounded-bl-xl rounded-tr-xl text-center"
               value={"submit"}
             />

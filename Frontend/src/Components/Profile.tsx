@@ -1,7 +1,20 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 const Profile = () => {
   const [edit, setEdit] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  const user = useSelector((state: RootState) => state.User);
+
+  useEffect(() => {
+    setName(user.name);
+    setPhone(user.phone);
+    setEmail(user.email);
+  }, []);
 
   return (
     <div className="h-screen  bg-gray-200 pt-12">
@@ -93,6 +106,8 @@ const Profile = () => {
                 <dt className="text-sm font-medium text-gray-500">Full name</dt>
                 {edit ? (
                   <input
+                    onChange={(e) => setName(e.target.value)}
+                    defaultValue={name}
                     type="text"
                     className="bg-gray-200 w-48 h-7 rounded-sm pl-2 text-sm"
                   />
@@ -108,7 +123,9 @@ const Profile = () => {
                 </dt>
                 {edit ? (
                   <input
-                    type="text"
+                    onChange={(e) => setPhone(e.target.value)}
+                    defaultValue={phone}
+                    type="number"
                     className="bg-gray-200 w-48 h-7 rounded-sm pl-2 text-sm"
                   />
                 ) : (
@@ -123,7 +140,9 @@ const Profile = () => {
                 </dt>
                 {edit ? (
                   <input
-                    type="text"
+                    onChange={(e) => setEmail(e.target.value)}
+                    defaultValue={email}
+                    type="email"
                     className="bg-gray-200 w-48 h-7 rounded-sm pl-2 text-sm"
                   />
                 ) : (

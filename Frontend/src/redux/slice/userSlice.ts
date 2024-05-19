@@ -4,7 +4,9 @@ interface userState {
     name: string
     email: string
     id: string
-    is_admin: boolean,
+    is_admin: boolean
+    phone:string
+    image:string
 
 }
 
@@ -13,6 +15,8 @@ const initialState: userState = {
     email: '',
     id: '',
     is_admin: false,
+    phone:'',
+    image:""
 }
 
 const userSlice = createSlice({
@@ -26,6 +30,8 @@ const userSlice = createSlice({
             state.email = action.payload.email
             state.is_admin = action.payload.is_admin
             state.id = action.payload.id
+            state.phone=action.payload.phone
+            state.image=action.payload.image
         }
     }
 

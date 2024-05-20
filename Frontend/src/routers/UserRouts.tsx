@@ -10,7 +10,7 @@ export const UserRouts = () => {
   return (
     
       <Routes> 
-        <Route path="/" element={<LogAuth > <Home /> </LogAuth>} />
+        <Route path="/*" element={<LogAuth > <Home /> </LogAuth>} />
         <Route path="/profile" element={<LogAuth > <Profile /> </LogAuth>} />
         <Route path="/login" element={<LogOutAuth> <Login /> </LogOutAuth>} />
         <Route path="/signup" element={<LogOutAuth> <Signup /> </LogOutAuth>}/>

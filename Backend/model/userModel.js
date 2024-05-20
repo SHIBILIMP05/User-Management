@@ -28,6 +28,14 @@ const userSchema = mongoose.Schema({
     token:{
         type:String,
         require:true
+    },
+    location:{
+        type:String,
+        require:true
+    },
+    image:{
+        type:String,
+        require:true
     }
 })
 

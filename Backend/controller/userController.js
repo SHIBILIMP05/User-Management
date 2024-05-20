@@ -10,7 +10,7 @@ export const starting = async (req, res) => {
    }
 }
 
-
+/* USER SIGN UP */
 
 export const signupDetail = async (req, res) => {
    try {
@@ -44,6 +44,8 @@ export const signupDetail = async (req, res) => {
    }
 }
 
+/* USER LOGIN */
+
 export const login = async (req, res) => {
    try {
       const { email, password } = req.body
@@ -62,6 +64,24 @@ export const login = async (req, res) => {
             res.json({ token: token, userData: userObject })
          }
       }
+   } catch (error) {
+      console.log(error);
+   }
+}
+
+
+/* UPDATE USER DETAILS */
+
+export const updateDetails = async(req,res)=>{
+   try {
+      const {name,phone,email,location} = req.body
+
+      const updatedUser = await User.findOneAndUpdate({email:email},{
+         name:name,phone:phone,email:email,location:location
+      },{new:true})
+
+      res.json({updatedUser:updatedUser})
+
    } catch (error) {
       console.log(error);
    }

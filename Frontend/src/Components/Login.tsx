@@ -7,44 +7,46 @@ import { userDetails } from "../redux/slice/userSlice";
 
 const Login = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const [email,setEmail] = useState('')
-  const [password,setPassword]=useState('')
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const emailPattern: RegExp =
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
-  
-  const handleLogin = async()=>{
-
-    if(!email||email.startsWith(" ")||!emailPattern.test(email)){
-      return toast.error("Please enter a valid email !")
-    }else if(!password){
-      return toast.error("Please enter the password !")
+  const handleLogin = async () => {
+    if (!email || email.startsWith(" ") || !emailPattern.test(email)) {
+      return toast.error("Please enter a valid email !");
+    } else if (!password) {
+      return toast.error("Please enter the password !");
     }
-   const status = await login({
-    email:email,
-    password:password
-   })
+    const status = await login({
+      email: email,
+      password: password,
+    });
 
-       if(status.verify){
-        return toast.error("You don't hav an account, please register your account !")
-       }else if(status.invalid){
-        return toast.error("Please enter a valid password !")
-       }else{
-        localStorage.setItem("token",status.token)
-        dispatch(userDetails({
+    if (status.verify) {
+      return toast.error(
+        "You don't hav an account, please register your account !"
+      );
+    } else if (status.invalid) {
+      return toast.error("Please enter a valid password !");
+    } else {
+      localStorage.setItem("token", status.token);
+      dispatch(
+        userDetails({
           name: status.userData.name,
           email: status.userData.email,
           is_admin: status.userData.is_admin,
           id: status.userData.id,
-        }))
-        navigate('/')
-       }
-
-
-
-  }
+          phone: status.userData.phone,
+          location: status.userData.location,
+          image:status.useData.image
+        })
+      );
+      navigate("/");
+    }
+  };
 
   return (
     <div className="w-screen bg-C2 h-screen flex justify-center items-center">
@@ -56,16 +58,16 @@ const Login = () => {
           <div className=" font-font11 text-xl font-semibold flex relative bottom-2 flex-col gap-y-3 justify-center w-auto h-auto">
             <label className="text-C1">Email</label>
             <input
-            defaultValue={email}
-            onChange={(e)=>setEmail(e.target.value)}
+              defaultValue={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="h-10 w-64 rounded-tl-xl rounded-br-xl"
               type="text"
               name="email"
             />
             <label className="text-C1">Passwrod</label>
             <input
-            defaultValue={password}
-            onChange={(e)=>setPassword(e.target.value)}
+              defaultValue={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="h-10 w-64 rounded-tl-xl rounded-br-xl"
               type="password"
               name="password"
@@ -83,8 +85,8 @@ const Login = () => {
 
           <div className=" w-auto h-auto">
             <input
-            onClick={handleLogin}
-            type="submit"
+              onClick={handleLogin}
+              type="submit"
               className=" bg-C1 text-C3 w-60 h-10 rounded-bl-xl rounded-tr-xl text-center"
               value={"submit"}
             />

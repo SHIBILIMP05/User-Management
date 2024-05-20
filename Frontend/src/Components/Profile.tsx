@@ -1,34 +1,134 @@
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
+import { toast } from "sonner";
+import { updateDetails } from "../APIs/userApi";
+import { userDetails } from "../redux/slice/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [edit, setEdit] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [image,setImage] = useState<File | null>(null)
+  const [location, setLocation] = useState("");
+
+  const emailPattern: RegExp =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+
+  const phonePattern = /^[0-9]{10}$/;
 
   const user = useSelector((state: RootState) => state.User);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    setName(user.name);
-    setPhone(user.phone);
-    setEmail(user.email);
-  }, []);
+  const handleSubmit = async () => {
+    if (name.length < 4) {
+      return toast.error("Name should be atleast 4 character !");
+    } else if (name.startsWith(" ")) {
+      return toast.error("Name can't start with space !");
+    } else if (!phone || !phonePattern.test(phone)) {
+      return toast.error("Please enter a valid mobile number !");
+    } else if (email.startsWith(" ") || !email || !emailPattern.test(email)) {
+      return toast.error("Please enter a valid email !");
+    } else if (!location) {
+      return toast.error("Plese Provide your location !");
+    }
+
+    const status = await updateDetails({
+      name: name,
+      phone: phone,
+      email: email,
+      location: location,
+      image:image
+    });
+
+    if (status) {
+      dispatch(
+        userDetails({
+          name: status.updatedUser.name,
+          phone: status.updatedUser.phone,
+          email: status.updatedUser.email,
+          location: status.updatedUser.location,
+        })
+      );
+    }
+
+    console.log("status ::::==>", status);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    console.log("image file====>:",file);
+    
+    if (file) {
+      setImage(file);
+    }
+  };
 
   return (
     <div className="h-screen  bg-gray-200 pt-12">
-      <div className="max-w-sm mx-auto bg-white  rounded-lg overflow-hidden shadow-lg">
-        <div className="border-b px-4 pb-6">
-          <div className="text-center my-4">
-            <img
-              className="h-32 w-32 rounded-full border-4 border-white  mx-auto my-4"
-              src="../src/assets/office-woman-planning-route-for-travel.png"
-              alt=""
+      <div className="max-w-sm mx-auto bg-white/35  rounded-lg overflow-hidden shadow-lg">
+        <div className="relative border-b px-4 pb-6">
+          <svg
+            onClick={() => navigate("/")}
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="relative top-4 w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
             />
+          </svg>
+
+          <div className="text-center my-4">
+            <div className="relative w-32 h-32 mx-auto">
+              <img
+                className="w-32 h-32 rounded-full border-4 border-white object-cover"
+                src="../src/assets/office-woman-planning-route-for-travel.png"
+                alt="Profile"
+              />
+              <input
+              onChange={(e)=>handleChange(e)}
+                id="profile"
+                type="file"
+                className="hidden absolute inset-0 w-full h-full opacity-0 "
+                accept="image/*"
+              />
+              <label
+                htmlFor="profile"
+                className="cursor-pointer absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  className="text-white/70 w-6 h-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
+                  />
+                </svg>
+              </label>
+            </div>
             <div className="py-2">
               <h3 className="font-bold text-2xl text-gray-800 mb-1">
-                Cait Genevieve
+                {user.name}
               </h3>
               <div className="inline-flex text-gray-700  items-center">
                 <svg
@@ -44,7 +144,7 @@ const Profile = () => {
                     d="M5.64 16.36a9 9 0 1 1 12.72 0l-5.65 5.66a1 1 0 0 1-1.42 0l-5.65-5.66zm11.31-1.41a7 7 0 1 0-9.9 0L12 19.9l4.95-4.95zM12 14a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"
                   />
                 </svg>
-                New York, NY
+                {user.location}
               </div>
             </div>
           </div>
@@ -107,13 +207,13 @@ const Profile = () => {
                 {edit ? (
                   <input
                     onChange={(e) => setName(e.target.value)}
-                    defaultValue={name}
+                    defaultValue={user.name}
                     type="text"
                     className="bg-gray-200 w-48 h-7 rounded-sm pl-2 text-sm"
                   />
                 ) : (
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    Mickael Poulaz
+                    {user.name}
                   </dd>
                 )}
               </div>
@@ -124,13 +224,13 @@ const Profile = () => {
                 {edit ? (
                   <input
                     onChange={(e) => setPhone(e.target.value)}
-                    defaultValue={phone}
-                    type="number"
+                    defaultValue={user.phone}
+                    type="text"
                     className="bg-gray-200 w-48 h-7 rounded-sm pl-2 text-sm"
                   />
                 ) : (
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    React JS
+                    {user.phone}
                   </dd>
                 )}
               </div>
@@ -141,20 +241,38 @@ const Profile = () => {
                 {edit ? (
                   <input
                     onChange={(e) => setEmail(e.target.value)}
-                    defaultValue={email}
+                    defaultValue={user.email}
                     type="email"
                     className="bg-gray-200 w-48 h-7 rounded-sm pl-2 text-sm"
                   />
                 ) : (
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    m.poul@example.com
+                    {user.email}
+                  </dd>
+                )}
+              </div>
+              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt className="text-sm font-medium text-gray-500">Location</dt>
+                {edit ? (
+                  <input
+                    onChange={(e) => setLocation(e.target.value)}
+                    defaultValue={user.location}
+                    type="text"
+                    className="bg-gray-200 w-48 h-7 rounded-sm pl-2 text-sm"
+                  />
+                ) : (
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    {user.location}
                   </dd>
                 )}
               </div>
             </dl>
             {edit && (
               <div className="flex gap-2 px-2 mb-2">
-                <button className="flex-1 rounded-full bg-blue-600 dark:bg-blue-800 text-white dark:text-white antialiased font-bold hover:bg-blue-800 dark:hover:bg-blue-900 px-4 py-2">
+                <button
+                  onClick={handleSubmit}
+                  className="flex-1 rounded-full bg-blue-600 dark:bg-blue-800 text-white dark:text-white antialiased font-bold hover:bg-blue-800 dark:hover:bg-blue-900 px-4 py-2"
+                >
                   submit
                 </button>
               </div>

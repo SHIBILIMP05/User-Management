@@ -1,13 +1,31 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { userDetails } from "../redux/slice/userSlice";
 
 const Headers = () => {
   const [state, setState] = useState(false);
 
-  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.User);
+
+  const handleLogOut = () => {
+    dispatch(
+      userDetails({
+        name: "",
+        email: "",
+        id: "",
+        is_admin: false,
+        phone: "",
+        image: "",
+        location: "",
+      })
+    );
+    localStorage.removeItem("token");
+    navigate('/login')
+  };
 
   return (
     <header className="backdrop-opacity-10 backdrop-invert bg-gray-600/15 z-40 relative top-3 mx-3 items-center  h-16  shadow-lg rounded-2xl">
@@ -55,7 +73,7 @@ const Headers = () => {
               />
             </a>
             {state && (
-              <div className="absolute top-14 right-0 w-36 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+              <div className=" absolute top-14 right-0 w-36 mt-2 origin-top-right bg-white/60 rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
                 <div
                   className="py-1 "
                   role="menu"
@@ -63,8 +81,8 @@ const Headers = () => {
                   aria-labelledby="options-menu"
                 >
                   <a
-                    onClick={()=>navigate('/profile')}
-                    className="block  px-4 py-2 text-md text-gray-700 hover:bg-gray-100 hover:text-gray-900   "
+                    onClick={() => navigate("/profile")}
+                    className="block  px-4 py-2 text-md text-white hover:bg-gray-100 hover:text-gray-900   "
                     role="menuitem"
                   >
                     <span className="flex gap-2">
@@ -87,8 +105,9 @@ const Headers = () => {
                     </span>
                   </a>
                   <a
-                    href="#"
-                    className=" block px-4 py-2 text-md text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    onClick={handleLogOut}
+                   
+                    className=" block px-4 py-2 text-md text-white hover:bg-gray-100 hover:text-gray-900"
                     role="menuitem"
                   >
                     <span className="flex gap-2">

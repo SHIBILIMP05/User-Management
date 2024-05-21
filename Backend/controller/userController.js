@@ -48,20 +48,36 @@ export const signupDetail = async (req, res) => {
 
 export const login = async (req, res) => {
    try {
+
+      const admin = {
+         email: "admin12@gmail.com",
+         password: "123qwe"
+      }
+
       const { email, password } = req.body
-
-      const userData = await User.findOne({ email: email })
-
-      if (!userData) {
-         res.json({ verify: true })
-      } else {
-         const passCheck = await bcrypt.compare(password, userData.password)
-         if (!passCheck) {
+      if (email === admin.email) {
+         if (password !== admin.password) {
             res.json({ invalid: true })
+
          } else {
-            const userObject = userData.toObject()
-            const token = jwt.sign(userObject, process.env.JwtKey, { expiresIn: "30d" })
-            res.json({ token: token, userData: userObject })
+            res.json({ admin: true })
+         }
+      } else {
+
+         const userData = await User.findOne({ email: email })
+
+         if (!userData) {
+            res.json({ verify: true })
+         } else {
+            const passCheck = await bcrypt.compare(password, userData.password)
+            if (!passCheck) {
+               res.json({ invalid: true })
+            } else {
+               const userObject = userData.toObject()
+               console.log("userObject===>:", userObject);
+               const token = jwt.sign(userObject, process.env.JwtKey, { expiresIn: "30d" })
+               res.json({ token: token, userData: userObject })
+            }
          }
       }
    } catch (error) {
@@ -72,15 +88,26 @@ export const login = async (req, res) => {
 
 /* UPDATE USER DETAILS */
 
-export const updateDetails = async(req,res)=>{
+export const updateDetails = async (req, res) => {
    try {
-      const {name,phone,email,location} = req.body
-
-      const updatedUser = await User.findOneAndUpdate({email:email},{
-         name:name,phone:phone,email:email,location:location
-      },{new:true})
-
-      res.json({updatedUser:updatedUser})
+      const { id, name, phone, email, location } = req.body
+      const oldData = await User.findOne({ _id: id })
+      console.log("oldData:::", oldData);
+      console.log("imagepathhhhh::", req.body);
+      const imagefile = req.file ? req.file.filename : oldData.image
+      console.log("image:::", imagefile);
+      const updatedUser = await User.findOneAndUpdate(
+         { _id: id },
+         {
+            name: name,
+            phone: phone,
+            email: email,
+            location: location,
+            image: imagefile
+         },
+         { new: true })
+      console.log("updated detail ::", updatedUser);
+      res.json({ updatedUser: updatedUser })
 
    } catch (error) {
       console.log(error);

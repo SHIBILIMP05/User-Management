@@ -2,12 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../APIs/userApi";
 import { toast } from "sonner";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { userDetails } from "../redux/slice/userSlice";
+import { RootState } from "../redux/store";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.User);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,36 +17,46 @@ const Login = () => {
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
   const handleLogin = async () => {
-    if (!email || email.startsWith(" ") || !emailPattern.test(email)) {
-      return toast.error("Please enter a valid email !");
-    } else if (!password) {
-      return toast.error("Please enter the password !");
-    }
-    const status = await login({
-      email: email,
-      password: password,
-    });
+    try {
+      if (!email || email.startsWith(" ") || !emailPattern.test(email)) {
+        return toast.error("Please enter a valid email !");
+      } else if (!password) {
+        return toast.error("Please enter the password !");
+      }
+      const status = await login({
+        email: email,
+        password: password,
+      });
 
-    if (status.verify) {
-      return toast.error(
-        "You don't hav an account, please register your account !"
-      );
-    } else if (status.invalid) {
-      return toast.error("Please enter a valid password !");
-    } else {
-      localStorage.setItem("token", status.token);
-      dispatch(
-        userDetails({
-          name: status.userData.name,
-          email: status.userData.email,
-          is_admin: status.userData.is_admin,
-          id: status.userData.id,
-          phone: status.userData.phone,
-          location: status.userData.location,
-          image:status.useData.image
-        })
-      );
-      navigate("/");
+      const response = status.userData;
+
+      if (status.verify) {
+        return toast.error(
+          "You don't hav an account, please register your account !"
+        );
+      } else if (status.invalid) {
+        return toast.error("Please enter a valid password !");
+      } else if (status.admin) {
+       return navigate("/admin/dashboard");
+      } else {
+        localStorage.setItem("token", status.token);
+
+        dispatch(
+          userDetails({
+            name: response.name,
+            email: response.email,
+            is_admin: response.is_admin,
+            id: response._id,
+            phone: response.phone,
+            location: response.location,
+            image: response.image,
+          })
+        );
+
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 

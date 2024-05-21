@@ -35,7 +35,7 @@ const userSchema = mongoose.Schema({
     },
     image:{
         type:String,
-        require:true
+       
     }
 })
 

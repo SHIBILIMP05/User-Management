@@ -6,6 +6,7 @@ import { Provider } from "react-redux";
 import { persistor, store } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import React from "react";
+import AdminRouts from "./routers/AdminRouts.tsx";
 
 const App: React.FC = () => {
   return (
@@ -15,7 +16,7 @@ const App: React.FC = () => {
         <Router>
           <Routes>
             <Route path="/*" element={<UserRouts />} />
-            <Route path="/admin/*" element={<UserRouts />} />
+            <Route path="/admin/*" element={<AdminRouts />} />
           </Routes>
         </Router>
       </PersistGate>

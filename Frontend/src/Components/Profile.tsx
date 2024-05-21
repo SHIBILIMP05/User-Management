@@ -6,43 +6,55 @@ import { updateDetails } from "../APIs/userApi";
 import { userDetails } from "../redux/slice/userSlice";
 import { useNavigate } from "react-router-dom";
 
-const Profile = () => {
+const Profile: React.FC = () => {
+  const user = useSelector((state: RootState) => state.User);
+
+  type initialData = {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    image: string | File;
+    location: string;
+  };
+
+  const initialState: initialData = {
+    id: user.id || "",
+    name: user.name || "",
+    email: user.email || "",
+    phone: user.phone || "",
+    image: user.image || "",
+    location: user.location || "",
+  };
+  const [userData, setUserData] = useState(initialState);
   const [edit, setEdit] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [image,setImage] = useState<File | null>(null)
-  const [location, setLocation] = useState("");
 
   const emailPattern: RegExp =
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
   const phonePattern = /^[0-9]{10}$/;
 
-  const user = useSelector((state: RootState) => state.User);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
-    if (name.length < 4) {
-      return toast.error("Name should be atleast 4 character !");
-    } else if (name.startsWith(" ")) {
-      return toast.error("Name can't start with space !");
-    } else if (!phone || !phonePattern.test(phone)) {
-      return toast.error("Please enter a valid mobile number !");
-    } else if (email.startsWith(" ") || !email || !emailPattern.test(email)) {
-      return toast.error("Please enter a valid email !");
+    if (userData.name.length < 4) {
+      return toast.error("Name should be at least 4 characters!");
+    } else if (userData.name.startsWith(" ")) {
+      return toast.error("Name can't start with space!");
+    } else if (!userData.phone || !phonePattern.test(userData.phone)) {
+      return toast.error("Please enter a valid mobile number!");
+    } else if (
+      userData.email.startsWith(" ") ||
+      !userData.email ||
+      !emailPattern.test(userData.email)
+    ) {
+      return toast.error("Please enter a valid email!");
     } else if (!location) {
-      return toast.error("Plese Provide your location !");
+      return toast.error("Please provide your location!");
     }
 
-    const status = await updateDetails({
-      name: name,
-      phone: phone,
-      email: email,
-      location: location,
-      image:image
-    });
+    const status = await updateDetails(userData);
 
     if (status) {
       dispatch(
@@ -51,19 +63,23 @@ const Profile = () => {
           phone: status.updatedUser.phone,
           email: status.updatedUser.email,
           location: status.updatedUser.location,
+          id: status.updatedUser.id,
+          image: status.updatedUser.image,
         })
       );
     }
-
+    navigate('/')
     console.log("status ::::==>", status);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("event===>", e);
+
     const file = e.target.files?.[0];
-    console.log("image file====>:",file);
-    
+    console.log("image file====>:", file);
+
     if (file) {
-      setImage(file);
+      setUserData({ ...userData, image: file });
     }
   };
 
@@ -91,17 +107,22 @@ const Profile = () => {
             <div className="relative w-32 h-32 mx-auto">
               <img
                 className="w-32 h-32 rounded-full border-4 border-white object-cover"
-                src="../src/assets/office-woman-planning-route-for-travel.png"
+                src={
+                  userData.image
+                    ? `/uploads/${userData.image}`
+                    : "https://th.bing.com/th/id/OIP.puMo9ITfruXP8iQx9cYcqwHaGJ?pid=ImgDet&rs=1"
+                }
                 alt="Profile"
               />
-              <input
-              onChange={(e)=>handleChange(e)}
+             {edit&& <input
+                onChange={(e) => handleChange(e)}
                 id="profile"
                 type="file"
+                name="image"
                 className="hidden absolute inset-0 w-full h-full opacity-0 "
                 accept="image/*"
-              />
-              <label
+              />}
+              {edit&& <label
                 htmlFor="profile"
                 className="cursor-pointer absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full"
               >
@@ -124,11 +145,11 @@ const Profile = () => {
                     d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
                   />
                 </svg>
-              </label>
+              </label>}
             </div>
             <div className="py-2">
               <h3 className="font-bold text-2xl text-gray-800 mb-1">
-                {user.name}
+                {userData.name}
               </h3>
               <div className="inline-flex text-gray-700  items-center">
                 <svg
@@ -144,7 +165,7 @@ const Profile = () => {
                     d="M5.64 16.36a9 9 0 1 1 12.72 0l-5.65 5.66a1 1 0 0 1-1.42 0l-5.65-5.66zm11.31-1.41a7 7 0 1 0-9.9 0L12 19.9l4.95-4.95zM12 14a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"
                   />
                 </svg>
-                {user.location}
+                {userData.location}
               </div>
             </div>
           </div>
@@ -206,14 +227,16 @@ const Profile = () => {
                 <dt className="text-sm font-medium text-gray-500">Full name</dt>
                 {edit ? (
                   <input
-                    onChange={(e) => setName(e.target.value)}
-                    defaultValue={user.name}
+                    onChange={(e) =>
+                      setUserData({ ...userData, name: e.target.value })
+                    }
+                    defaultValue={userData.name}
                     type="text"
                     className="bg-gray-200 w-48 h-7 rounded-sm pl-2 text-sm"
                   />
                 ) : (
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {user.name}
+                    {userData.name}
                   </dd>
                 )}
               </div>
@@ -223,14 +246,16 @@ const Profile = () => {
                 </dt>
                 {edit ? (
                   <input
-                    onChange={(e) => setPhone(e.target.value)}
-                    defaultValue={user.phone}
+                    onChange={(e) =>
+                      setUserData({ ...userData, phone: e.target.value })
+                    }
+                    defaultValue={userData.phone}
                     type="text"
                     className="bg-gray-200 w-48 h-7 rounded-sm pl-2 text-sm"
                   />
                 ) : (
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {user.phone}
+                    {userData.phone}
                   </dd>
                 )}
               </div>
@@ -240,14 +265,16 @@ const Profile = () => {
                 </dt>
                 {edit ? (
                   <input
-                    onChange={(e) => setEmail(e.target.value)}
-                    defaultValue={user.email}
+                    onChange={(e) =>
+                      setUserData({ ...userData, email: e.target.value })
+                    }
+                    defaultValue={userData.email}
                     type="email"
                     className="bg-gray-200 w-48 h-7 rounded-sm pl-2 text-sm"
                   />
                 ) : (
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {user.email}
+                    {userData.email}
                   </dd>
                 )}
               </div>
@@ -255,14 +282,16 @@ const Profile = () => {
                 <dt className="text-sm font-medium text-gray-500">Location</dt>
                 {edit ? (
                   <input
-                    onChange={(e) => setLocation(e.target.value)}
-                    defaultValue={user.location}
+                    onChange={(e) =>
+                      setUserData({ ...userData, location: e.target.value })
+                    }
+                    defaultValue={userData.location}
                     type="text"
                     className="bg-gray-200 w-48 h-7 rounded-sm pl-2 text-sm"
                   />
                 ) : (
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {user.location}
+                    {userData.location}
                   </dd>
                 )}
               </div>

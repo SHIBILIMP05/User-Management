@@ -7,6 +7,7 @@ import { userDetails } from "../redux/slice/userSlice";
 const Headers = () => {
   const [state, setState] = useState(false);
 
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.User);
@@ -68,7 +69,11 @@ const Headers = () => {
             <a onClick={() => setState(!state)} className="relative block">
               <img
                 alt="profil"
-                src="../src/assets/office-woman-planning-route-for-travel.png"
+                src={
+                  user.image
+                    ? `/uploads/${user.image}`
+                    : "https://th.bing.com/th/id/OIP.puMo9ITfruXP8iQx9cYcqwHaGJ?pid=ImgDet&rs=1"
+                }
                 className="mx-auto object-cover rounded-full h-12 w-12 "
               />
             </a>

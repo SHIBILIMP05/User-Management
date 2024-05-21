@@ -47,7 +47,9 @@ export const Signup = () => {
             name: status.userData.name,
             email: status.userData.email,
             is_admin: status.userData.is_admin,
-            id: status.userData.id,
+            id: status.userData._id,
+            phone: "",
+            image: "",
           })
         );
         navigate("/");
@@ -57,7 +59,7 @@ export const Signup = () => {
     }
   };
 
-  return(
+  return (
     <div className="w-screen bg-C2 h-screen flex justify-center items-center">
       <div className=" bg-C3 w-[500px] h-[700px]  flex justify-center items-center">
         <div className="w-[500px] h-[700px] py-6 flex flex-col  items-center justify-between bg-C2 rounded-tl-full rounded-br-full ">

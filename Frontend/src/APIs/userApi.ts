@@ -42,18 +42,37 @@ export const login = async (logDetails: LogDetails) => {
 }
 
 interface updateDetails {
-    name: string
-    phone: string
-    email: string
-    location: string
-    image:File|null
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    image: string | File;
+    location: string;
 }
 
-export const updateDetails = async (updateDetails: updateDetails)=>{
+export const updateDetails = async ({ name, email, phone, image, id, location }: updateDetails) => {
 
     try {
+        const data = new FormData()
+        data.append("id", id)
+        data.append("name", name)
+        data.append("emil", email)
+        data.append("phone", phone)
+        data.append("image", image)
+        data.append("location", location)
 
-        const response = await instance.post('/updateProfile', updateDetails)
+        const config = {
+            header: {
+                "content-type": "multipart/form-data",
+                userId: id,
+            },
+            withCredentials: true,
+        };
+
+        console.log("updateDetails==>", data);
+
+
+        const response = await instance.post('/updateProfile', data, config)
         return response.data
 
     } catch (error) {

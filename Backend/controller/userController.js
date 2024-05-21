@@ -60,7 +60,8 @@ export const login = async (req, res) => {
             res.json({ invalid: true })
 
          } else {
-            res.json({ admin: true })
+            const adminToken = jwt.sign(admin, process.env.JwtKey, { expiresIn: "30d" })
+            res.json({ admin: true , adminToken:adminToken })
          }
       } else {
 

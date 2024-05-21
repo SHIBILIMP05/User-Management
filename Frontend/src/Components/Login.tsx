@@ -37,6 +37,7 @@ const Login = () => {
       } else if (status.invalid) {
         return toast.error("Please enter a valid password !");
       } else if (status.admin) {
+        localStorage.setItem("adminToken",status.adminToken)
        return navigate("/admin/dashboard");
       } else {
         localStorage.setItem("token", status.token);

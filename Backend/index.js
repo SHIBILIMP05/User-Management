@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import { connectDB } from './config/mongoAuth.js'
 import {userRouter} from './routers/userRouter.js'
+import {adminRouter} from './routers/adminRouter.js'
 
 dotenv.config()
 connectDB()
@@ -17,6 +18,7 @@ app.use(cors({
 }))
 
 app.use('/', userRouter)
+app.use('/admin',adminRouter)
 
 app.listen(5000, () => {
     console.log("server is running...");
